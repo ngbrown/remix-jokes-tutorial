@@ -1,6 +1,7 @@
 import type { ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
+import { z } from "zod";
 
 import { db } from "~/utils/db.server";
 
@@ -16,17 +17,26 @@ function validateJokeName(name: string) {
   }
 }
 
-type ActionData = {
-  formError?: string;
-  fieldErrors?: {
-    name: string | undefined;
-    content: string | undefined;
-  };
-  fields?: {
-    name: string;
-    content: string;
-  };
-};
+const ActionData = z
+  .object({
+    formError: z.string().optional(),
+    fieldErrors: z
+      .object({
+        name: z.string().optional(),
+        content: z.string().optional(),
+      })
+      .optional(),
+    fields: z
+      .object({
+        name: z.string(),
+        content: z.string(),
+      })
+      .optional(),
+  })
+  .optional();
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type ActionData = z.infer<typeof ActionData>;
 
 const badRequest = (data: ActionData) => json(data, { status: 400 });
 
@@ -54,7 +64,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function NewJokeRoute() {
-  const actionData = useActionData<ActionData>();
+  const actionData = ActionData.parse(useActionData());
 
   return (
     <div>
