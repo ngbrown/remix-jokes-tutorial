@@ -1,11 +1,15 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import type { Joke } from "@prisma/client";
+import { z } from "zod";
+import { JokeModel } from "@prisma/zod";
 
 import { db } from "~/utils/db.server";
 
-type LoaderData = { joke: Joke };
+const LoaderData = z.object({ joke: JokeModel });
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type LoaderData = z.infer<typeof LoaderData>;
 
 export const loader: LoaderFunction = async ({ params }) => {
   const joke = await db.joke.findUnique({

@@ -1,6 +1,7 @@
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, Link, useLoaderData } from "@remix-run/react";
+import { z } from "zod";
 import { db } from "~/utils/db.server";
 
 import stylesUrl from "~/styles/jokes.css";
@@ -9,9 +10,12 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: stylesUrl }];
 };
 
-type LoaderData = {
-  jokeListItems: Array<{ id: string; name: string }>;
-};
+const LoaderData = z.object({
+  jokeListItems: z.array(z.object({ id: z.string(), name: z.string() })),
+});
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type LoaderData = z.infer<typeof LoaderData>;
 
 export const loader: LoaderFunction = async () => {
   const data: LoaderData = {
@@ -25,7 +29,7 @@ export const loader: LoaderFunction = async () => {
 };
 
 export default function JokesRoute() {
-  const data = useLoaderData<LoaderData>();
+  const data = LoaderData.parse(useLoaderData());
 
   return (
     <div className="jokes-layout">

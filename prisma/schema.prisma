@@ -5,6 +5,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator zod {
+    provider = "zod-prisma"
+    imports = "../app/zod-schemas"
+}
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
@@ -12,8 +17,8 @@ datasource db {
 
 model Joke {
   id         String   @id @default(uuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now()) /// @zod.custom(imports.dateSchema)
+  updatedAt  DateTime @updatedAt /// @zod.custom(imports.dateSchema)
   name       String
   content    String
 }

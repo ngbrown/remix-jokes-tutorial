@@ -1,11 +1,15 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import type { Joke } from "@prisma/client";
+import { z } from "zod";
+import { JokeModel } from "@prisma/zod";
 
 import { db } from "~/utils/db.server";
 
-type LoaderData = { randomJoke: Joke };
+const LoaderData = z.object({ randomJoke: JokeModel });
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type LoaderData = z.infer<typeof LoaderData>;
 
 export const loader: LoaderFunction = async () => {
   const count = await db.joke.count();
@@ -19,7 +23,7 @@ export const loader: LoaderFunction = async () => {
 };
 
 export default function JokesIndexRoute() {
-  const data = useLoaderData<LoaderData>();
+  const data = LoaderData.parse(useLoaderData());
 
   return (
     <div>
