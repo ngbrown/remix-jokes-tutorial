@@ -15,8 +15,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now()) /// @zod.custom(imports.dateSchema)
+  updatedAt    DateTime @updatedAt /// @zod.custom(imports.dateSchema)
+  username     String   @unique
+  passwordHash String
+  jokes        Joke[]
+}
+
 model Joke {
   id         String   @id @default(uuid())
+  jokesterId String
+  jokester   User     @relation(fields: [jokesterId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now()) /// @zod.custom(imports.dateSchema)
   updatedAt  DateTime @updatedAt /// @zod.custom(imports.dateSchema)
   name       String
