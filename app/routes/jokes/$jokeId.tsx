@@ -1,6 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useParams } from "@remix-run/react";
 import { z } from "zod";
 import { JokeModel } from "@prisma/zod";
 
@@ -29,5 +29,12 @@ export default function JokeRoute() {
       <p>{data.joke.content}</p>
       <Link to=".">{data.joke.name} Permalink</Link>
     </div>
+  );
+}
+
+export function ErrorBoundary() {
+  const { jokeId } = useParams();
+  return (
+    <div className="error-container">{`There was an error loading joke by the id ${jokeId}. Sorry.`}</div>
   );
 }
