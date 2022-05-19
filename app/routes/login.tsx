@@ -1,6 +1,7 @@
 import type { ActionFunction, LinksFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, Link, useSearchParams } from "@remix-run/react";
+import { z } from "zod";
 
 import { db } from "~/utils/db.server";
 import { createUserSession, login, register } from "~/utils/session.server";
@@ -31,18 +32,27 @@ function validateUrl(url: any) {
   return "/jokes";
 }
 
-type ActionData = {
-  formError?: string;
-  fieldErrors?: {
-    username: string | undefined;
-    password: string | undefined;
-  };
-  fields?: {
-    loginType: string;
-    username: string;
-    password: string;
-  };
-};
+const ActionData = z
+  .object({
+    formError: z.string().optional(),
+    fieldErrors: z
+      .object({
+        username: z.string().optional(),
+        password: z.string().optional(),
+      })
+      .optional(),
+    fields: z
+      .object({
+        loginType: z.string(),
+        username: z.string(),
+        password: z.string(),
+      })
+      .optional(),
+  })
+  .optional();
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type ActionData = z.infer<typeof ActionData>;
 
 const badRequest = (data: ActionData) => json(data, { status: 400 });
 
@@ -112,7 +122,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function Login() {
-  const actionData = useActionData<ActionData>();
+  const actionData = ActionData.parse(useActionData());
   const [searchParams] = useSearchParams();
   return (
     <div className="container">

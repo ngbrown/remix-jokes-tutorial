@@ -21,7 +21,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function JokeRoute() {
-  const data = useLoaderData<LoaderData>();
+  const data = LoaderData.parse(useLoaderData());
 
   return (
     <div>
