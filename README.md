@@ -51,3 +51,17 @@ rm -rf app
 # copy your app over
 cp -R ../my-old-remix-app/app app
 ```
+
+## Database
+
+Initialize SQLite database:
+
+```sh
+npx prisma db push
+```
+
+Seed with data and a demo user:
+
+```sh
+npx prisma db seed
+```
