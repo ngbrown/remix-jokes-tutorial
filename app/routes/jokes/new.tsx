@@ -61,6 +61,7 @@ export const action: ActionFunction = async ({ request }) => {
     return badRequest({ fieldErrors, fields });
   }
 
+  throw new Error("Testing Error Boundary");
   const joke = await db.joke.create({
     data: { ...fields, jokesterId: userId },
   });
